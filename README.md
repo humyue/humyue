@@ -1,5 +1,3 @@
-### Hi there 👋
-
 <!-- STATS:START -->
 ![GitHub Stats](./assets/stats.svg)
 <!-- STATS:END -->
