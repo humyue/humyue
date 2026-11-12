@@ -1,5 +1,9 @@
 ### Hi there 👋
 
+<!-- STATS:START -->
+![GitHub Stats](./assets/stats.svg)
+<!-- STATS:END -->
+
 <!--
 **humyue/humyue** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
 
