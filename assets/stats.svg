@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="316" viewBox="0 0 720 316" role="img" aria-label="GitHub stats for humyue">
+  <style>
+    .bg { fill: #FDFCF8; }
+    .tile { fill: #F5F2E9; }
+    .bd { fill: rgba(28, 25, 23, 0.12); }
+    .ln { stroke: rgba(28, 25, 23, 0.12); stroke-width: 1; }
+    .t { fill: #1C1917; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 16px; font-weight: 500; }
+    .val { fill: #1C1917; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .val.hero { fill: #78350F; }
+    .lab { fill: #57534E; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 12px; font-weight: 400; }
+    .strong { fill: #1C1917; font-weight: 500; }
+    .tm { fill: #57534E; font-size: 12px; font-weight: 400; }
+    .bt { fill: #78350F; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; font-size: 12px; font-weight: 500; }
+    .chip { fill: #FEF3C7; stroke: #FDE68A; stroke-width: 1; }
+    .s1 { fill: #B45309; }
+    .s2 { fill: #FDE68A; }
+    .s3 { fill: #D97706; }
+    .s4 { fill: #F97316; }
+    .so { fill: #D6D3D1; }
+    .accent { fill: #D97706; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #1C1917; }
+      .tile { fill: #292524; }
+      .bd { fill: rgba(231, 229, 228, 0.12); }
+      .ln { stroke: rgba(231, 229, 228, 0.12); }
+      .t, .val, .strong { fill: #E7E5E4; }
+      .val.hero { fill: #FEF3C7; }
+      .lab, .tm { fill: #A8A29E; }
+      .bt { fill: #FEF3C7; }
+      .chip { fill: #78350F; stroke: #B45309; }
+      .s1 { fill: #F59E0B; }
+      .s2 { fill: #92400E; }
+      .s3 { fill: #D97706; }
+      .s4 { fill: #FB923C; }
+      .so { fill: #57534E; }
+      .accent { fill: #F59E0B; }
+    }
+  </style>
+  <defs><clipPath id="card"><rect x="0.5" y="0.5" width="719" height="315" rx="12"/></clipPath></defs>
+  <rect x="0.5" y="0.5" width="719" height="315" rx="12" class="bg"/>
+  <g clip-path="url(#card)"><rect x="0" y="0" width="720" height="3" class="accent"/></g>
+  <text x="24" y="41" class="t">GitHub Stats<tspan class="tm"> · GitHub 统计</tspan></text>
+  <rect x="627" y="23" width="69" height="24" rx="12" class="chip"/>
+  <text x="661.5" y="39" class="bt" text-anchor="middle">@humyue</text>
+  <rect x="24" y="64" width="672" height="125" class="bd"/>
+  <rect x="24" y="64" width="223.33" height="62" class="tile"/>
+  <rect x="248.33" y="64" width="223.33" height="62" class="tile"/>
+  <rect x="472.67" y="64" width="223.33" height="62" class="tile"/>
+  <rect x="24" y="127" width="223.33" height="62" class="tile"/>
+  <rect x="248.33" y="127" width="223.33" height="62" class="tile"/>
+  <rect x="472.67" y="127" width="223.33" height="62" class="tile"/>
+  <text x="40" y="91" class="val hero">13</text>
+  <text x="40" y="111" class="lab">Total Stars · 总 Star</text>
+  <text x="264.33" y="91" class="val">12</text>
+  <text x="264.33" y="111" class="lab">Public Repos · 公开仓库</text>
+  <text x="488.67" y="91" class="val">4</text>
+  <text x="488.67" y="111" class="lab">Followers · 关注者</text>
+  <text x="40" y="154" class="val">31</text>
+  <text x="40" y="174" class="lab">Contributions 1y · 近一年贡献</text>
+  <text x="264.33" y="154" class="val">31</text>
+  <text x="264.33" y="174" class="lab">Commits 1y · 近一年提交</text>
+  <text x="488.67" y="154" class="val">2 天</text>
+  <text x="488.67" y="174" class="lab">Current Streak · 当前连击</text>
+  <text x="24" y="213" class="tm">Top Languages · 常用语言</text>
+  <clipPath id="bar"><rect x="24" y="224" width="672" height="8" rx="4"/></clipPath>
+  <g clip-path="url(#bar)"><rect x="24" y="224" width="219.76" height="8" class="s1"/><rect x="245.76" y="224" width="145.84" height="8" class="s2"/><rect x="393.6" y="224" width="145.84" height="8" class="s3"/><rect x="541.44" y="224" width="71.92" height="8" class="s4"/><rect x="615.36" y="224" width="73.92" height="8" class="so"/></g>
+  <circle cx="28" cy="250" r="4" class="s1"/><text x="38" y="254" class="lab">Python <tspan class="strong">33%</tspan></text>
+  <circle cx="162.4" cy="250" r="4" class="s2"/><text x="172.4" y="254" class="lab">JavaScript <tspan class="strong">22%</tspan></text>
+  <circle cx="296.8" cy="250" r="4" class="s3"/><text x="306.8" y="254" class="lab">HTML <tspan class="strong">22%</tspan></text>
+  <circle cx="431.2" cy="250" r="4" class="s4"/><text x="441.2" y="254" class="lab">SCSS <tspan class="strong">11%</tspan></text>
+  <circle cx="565.6" cy="250" r="4" class="so"/><text x="575.6" y="254" class="lab">TypeScript <tspan class="strong">11%</tspan></text>
+  <line x1="24" y1="276" x2="696" y2="276" class="ln"/>
+  <text x="24" y="296" class="lab">Updated 2026-11-12 23:03 (UTC+8) · 每日自动更新</text>
+  <text x="696" y="296" class="lab" text-anchor="end">Powered by GitHub Actions</text>
+</svg>
