@@ -262,8 +262,7 @@ export function renderCard(stats) {
   ${barSegs.length ? `<clipPath id="bar"><rect x="${barX}" y="${barY}" width="${barW}" height="8" rx="4"/></clipPath>\n  <g clip-path="url(#bar)">${barSegs.join("")}</g>` : `<text x="24" y="${barY + 8}" class="lab">No data</text>`}
   ${legend.join("\n  ")}
   <line x1="24" y1="276" x2="696" y2="276" class="ln"/>
-  <text x="24" y="296" class="lab">Updated ${stats.updatedAt} (UTC+8) · 每日自动更新</text>
-  <text x="696" y="296" class="lab" text-anchor="end">Powered by GitHub Actions</text>
+  <text x="24" y="296" class="lab">Updated ${stats.updatedAt} (UTC+8) </text>
 </svg>
 `;
 }
