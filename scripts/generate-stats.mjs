@@ -13,7 +13,7 @@ const SVG_PATH = join(ROOT, "assets", "stats.svg");
 const README_PATH = join(ROOT, "README.md");
 
 const W = 720;
-const H = 316;
+const H = 366;
 
 /* ---------------------------------- 数据 ---------------------------------- */
 
@@ -23,11 +23,6 @@ query($login: String!) {
     followers { totalCount }
     repositories(ownerAffiliations: OWNER, isFork: false) { totalCount }
     contributionsCollection {
-      restrictedContributionsCount
-      totalCommitContributions
-      totalPullRequestContributions
-      totalIssueContributions
-      totalPullRequestReviewContributions
       contributionCalendar { weeks { contributionDays { date contributionCount } } }
     }
   }
@@ -81,54 +76,36 @@ export async function fetchStats(login) {
   } while (cursor);
 
   const c = user.contributionsCollection;
-  const contributions =
-    c.totalCommitContributions +
-    c.totalPullRequestContributions +
-    c.totalIssueContributions +
-    c.totalPullRequestReviewContributions +
-    c.restrictedContributionsCount;
-
-  const days = c.contributionCalendar.weeks
-    .flatMap((w) => w.contributionDays)
-    .map((d) => ({ date: d.date, count: d.contributionCount }));
-
-  const { current: currentStreak } = computeStreaks(days);
+  const weeks = c.contributionCalendar.weeks.map((w) =>
+    w.contributionDays.map((d) => ({ date: d.date, count: d.contributionCount })),
+  );
 
   return {
     login,
     stars,
     repos: user.repositories.totalCount,
     followers: user.followers.totalCount,
-    contributions,
-    commits: c.totalCommitContributions,
-    currentStreak,
+    languageCount: languages.size,
+    lastActive: lastActiveLabel(weeks),
     languages: topLanguages(languages, 5),
+    weeks: weeks.slice(-12),
     updatedAt: formatNow(),
   };
 }
 
-export function computeStreaks(days) {
-  let longest = 0;
-  let run = 0;
-  let prev = null;
-  for (const day of days) {
-    if (day.count > 0) {
-      run = prev && Date.parse(day.date) - Date.parse(prev) === 86400000 ? run + 1 : 1;
-      longest = Math.max(longest, run);
-    } else {
-      run = 0;
+// 距离最近一次有贡献的天数，转换成「今天/昨天/N 天前」
+function lastActiveLabel(weeks) {
+  const days = weeks.flat();
+  const latest = days[days.length - 1];
+  for (let i = days.length - 1; i >= 0; i -= 1) {
+    if (days[i].count > 0) {
+      const diff = Math.round((Date.parse(latest.date) - Date.parse(days[i].date)) / 86400000);
+      if (diff === 0) return "今天";
+      if (diff === 1) return "昨天";
+      return `${diff} 天前`;
     }
-    prev = day.date;
   }
-  // 今天还没贡献不应算断签，所以从倒数第二天继续往前数
-  let i = days.length - 1;
-  if (i >= 0 && days[i].count === 0) i -= 1;
-  let current = 0;
-  while (i >= 0 && days[i].count > 0) {
-    current += 1;
-    i -= 1;
-  }
-  return { current, longest };
+  return "—";
 }
 
 function topLanguages(counter, limit) {
@@ -164,7 +141,7 @@ const escapeXml = (s) =>
 const num = (n) => n.toLocaleString("en-US");
 
 export function renderCard(stats) {
-  // 网格：3 列 × 2 行，行/列之间留 1px 分隔线
+  // 网格：3 列单行，列之间留 1px 分隔线
   const gridX = 24;
   const gridW = W - 24 * 2;
   const tileW = (gridW - 2) / 3;
@@ -175,16 +152,13 @@ export function renderCard(stats) {
     { value: num(stats.stars), label: "Total Stars · 总 Star", hero: true },
     { value: num(stats.repos), label: "Public Repos · 公开仓库" },
     { value: num(stats.followers), label: "Followers · 关注者" },
-    { value: num(stats.contributions), label: "Contributions 1y · 近一年贡献" },
-    { value: num(stats.commits), label: "Commits 1y · 近一年提交" },
-    { value: `${num(stats.currentStreak)} 天`, label: "Current Streak · 当前连击" },
   ];
 
   const tileRects = [];
   const tileTexts = [];
   tiles.forEach((tile, i) => {
-    const x = gridX + (i % 3) * (tileW + 1);
-    const y = gridY + Math.floor(i / 3) * (tileH + 1);
+    const x = gridX + i * (tileW + 1);
+    const y = gridY;
     tileRects.push(`<rect x="${f(x)}" y="${y}" width="${f(tileW)}" height="${tileH}" class="tile"/>`);
     tileTexts.push(
       `<text x="${f(x + 16)}" y="${y + 27}" class="val${tile.hero ? " hero" : ""}">${numText(tile.value)}</text>`,
@@ -192,10 +166,26 @@ export function renderCard(stats) {
     );
   });
 
+  // 最近 12 周贡献热力图：一格一天，一列一周
+  const heatX = 40;
+  const heatY = 155;
+  const cell = 8;
+  const step = 11;
+  const heatCells = stats.weeks
+    .map((week, wi) =>
+      week
+        .map((day) => {
+          const row = new Date(`${day.date}T00:00:00Z`).getUTCDay();
+          return `<rect x="${heatX + wi * step}" y="${heatY + row * step}" width="${cell}" height="${cell}" rx="2" class="${heatLevel(day.count)}"/>`;
+        })
+        .join(""),
+    )
+    .join("");
+
   // 语言占比条
   const barX = 24;
   const barW = gridW;
-  const barY = 224;
+  const barY = 274;
   const series = ["s1", "s2", "s3", "s4", "so"];
   let cursorX = barX;
   const barSegs = stats.languages.map((lang, i) => {
@@ -208,7 +198,7 @@ export function renderCard(stats) {
   const legend = stats.languages.map((lang, i) => {
     const x = barX + i * (barW / Math.max(stats.languages.length, 1));
     const name = lang.name.length > 14 ? `${lang.name.slice(0, 13)}…` : lang.name;
-    return `<circle cx="${f(x + 4)}" cy="250" r="4" class="${series[i] ?? "so"}"/><text x="${f(x + 14)}" y="254" class="lab">${escapeXml(name)} <tspan class="strong">${lang.percent}%</tspan></text>`;
+    return `<circle cx="${f(x + 4)}" cy="298" r="4" class="${series[i] ?? "so"}"/><text x="${f(x + 14)}" y="302" class="lab">${escapeXml(name)} <tspan class="strong">${lang.percent}%</tspan></text>`;
   });
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="GitHub stats for ${escapeXml(stats.login)}">
@@ -231,6 +221,11 @@ export function renderCard(stats) {
     .s4 { fill: #F97316; }
     .so { fill: #D6D3D1; }
     .accent { fill: #D97706; }
+    .l0 { fill: #E7E1D3; }
+    .l1 { fill: #FDE68A; }
+    .l2 { fill: #FBBF24; }
+    .l3 { fill: #D97706; }
+    .l4 { fill: #92400E; }
     @media (prefers-color-scheme: dark) {
       .bg { fill: #1C1917; }
       .tile { fill: #292524; }
@@ -247,6 +242,11 @@ export function renderCard(stats) {
       .s4 { fill: #FB923C; }
       .so { fill: #57534E; }
       .accent { fill: #F59E0B; }
+      .l0 { fill: #3F3831; }
+      .l1 { fill: #78350F; }
+      .l2 { fill: #B45309; }
+      .l3 { fill: #F59E0B; }
+      .l4 { fill: #FDE68A; }
     }
   </style>
   <defs><clipPath id="card"><rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="12"/></clipPath></defs>
@@ -255,20 +255,29 @@ export function renderCard(stats) {
   <text x="24" y="41" class="t">GitHub Stats<tspan class="tm"> · GitHub 统计</tspan></text>
   <rect x="627" y="23" width="69" height="24" rx="12" class="chip"/>
   <text x="661.5" y="39" class="bt" text-anchor="middle">@${escapeXml(stats.login)}</text>
-  <rect x="${gridX}" y="${gridY}" width="${gridW}" height="${tileH * 2 + 1}" class="bd"/>
+  <rect x="${gridX}" y="${gridY}" width="${gridW}" height="${tileH}" class="bd"/>
   ${tileRects.join("\n  ")}
   ${tileTexts.join("\n  ")}
-  <text x="24" y="213" class="tm">Top Languages · 常用语言</text>
+  <rect x="24" y="127" width="672" height="112" class="tile"/>
+  <text x="40" y="147" class="tm">Last 12 Weeks · 最近 12 周</text>
+  ${heatCells}
+  <line x1="200" y1="147" x2="200" y2="225" class="ln"/>
+  <text x="224" y="180" class="val">${num(stats.languageCount)} 种</text>
+  <text x="224" y="200" class="lab">Languages · 语言数</text>
+  <text x="470" y="180" class="val">${escapeXml(stats.lastActive)}</text>
+  <text x="470" y="200" class="lab">Last Active · 最近活跃</text>
+  <text x="24" y="263" class="tm">Top Languages · 常用语言</text>
   ${barSegs.length ? `<clipPath id="bar"><rect x="${barX}" y="${barY}" width="${barW}" height="8" rx="4"/></clipPath>\n  <g clip-path="url(#bar)">${barSegs.join("")}</g>` : `<text x="24" y="${barY + 8}" class="lab">No data</text>`}
   ${legend.join("\n  ")}
-  <line x1="24" y1="276" x2="696" y2="276" class="ln"/>
-  <text x="24" y="296" class="lab">Updated ${stats.updatedAt} (UTC+8) </text>
+  <line x1="24" y1="326" x2="696" y2="326" class="ln"/>
+  <text x="24" y="346" class="lab">Updated ${stats.updatedAt} (UTC+8) </text>
 </svg>
 `;
 }
 
 const f = (n) => Math.round(n * 100) / 100;
 const numText = (s) => String(s).replace(/&/g, "&amp;");
+const heatLevel = (n) => (n === 0 ? "l0" : n < 3 ? "l1" : n < 6 ? "l2" : n < 10 ? "l3" : "l4");
 
 /* ---------------------------------- 主流程 -------------------------------- */
 
